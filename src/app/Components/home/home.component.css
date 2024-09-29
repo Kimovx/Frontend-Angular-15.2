@@ -1,0 +1,7 @@
+.inputs-group {
+  gap: 10px;
+}
+
+.inputs-group .form-input {
+  width: calc(100% / 3 - 10px) ;
+}

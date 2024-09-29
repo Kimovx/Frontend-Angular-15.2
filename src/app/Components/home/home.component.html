@@ -1,0 +1,397 @@
+<div class="container-fluid" dir="rtl">
+  <!-- Start Title OF The Page -->
+  <mat-card appearance="raised" class="mt-3">
+    <mat-card-content class="text-center h3 m-0">أمر شراء</mat-card-content>
+  </mat-card>
+  <!-- End Title OF The Page -->
+
+  <!-- Start Menu Of The Page -->
+  <div class="header d-flex justify-content-between align-items-center mt-3">
+    <!-- Start Title Of The Menu -->
+    <div class="d-flex flex-row align-items-center gap-1 text-data h4 mt-2 mb-2 text-primary">
+      <i class="fa-sharp fa-solid fa-arrow-left"></i>
+      <span>أمر شراء جديد</span>
+    </div>
+    <!-- End Title Of The Menu -->
+
+    <!-- Start Tools Of the Menu -->
+    <div class="tools-group d-flex flex-row align-items-center gap-2 user-select-none">
+      <mat-card matRipple (click)="startNewForm()"
+        class="tool d-flex flex-column align-items-center p-2 rounded-4 bg-primary text-white cursor-pointer">
+        <i class="fa-solid fa-plus"></i>
+        <span class="title">جديد</span>
+      </mat-card>
+
+      <mat-card matRipple (click)="enableEdit()"
+        class="tool d-flex flex-column align-items-center p-2 rounded-4 bg-primary text-white cursor-pointer">
+        <i class="fa-solid fa-pen-to-square"></i>
+        <span class="title">تعديل</span>
+      </mat-card>
+
+      <mat-card matRipple
+        class="tool d-flex flex-column align-items-center p-2 rounded-4 bg-primary text-white cursor-pointer">
+        <i class="fa-solid fa-rotate-left"></i>
+        <span class="title">تراجع</span>
+      </mat-card>
+
+      <mat-card matRipple
+        class="tool d-flex flex-column align-items-center p-2 rounded-4 bg-danger text-white cursor-pointer">
+        <i class="fa-solid fa-trash-can"></i>
+        <span class="title">حذف</span>
+      </mat-card>
+
+      <mat-card matRipple (click)="onSubmit()"
+        class="tool d-flex flex-column align-items-center p-2 rounded-4 bg-primary text-white cursor-pointer">
+        <i class="fa-sharp fa-solid fa-floppy-disk"></i>
+        <span class="title">حفظ</span>
+      </mat-card>
+
+      <mat-card matRipple
+        class="tool d-flex flex-column align-items-center p-2 rounded-4 bg-primary text-white cursor-pointer">
+        <i class="fa-sharp fa-solid fa-rotate"></i>
+        <span class="title">تهيئه</span>
+      </mat-card>
+
+      <mat-card matRipple
+        class="tool d-flex flex-column align-items-center p-2 rounded-4 bg-primary text-white cursor-pointer">
+        <i class="fa-solid fa-forward-step"></i>
+        <span class="title">الأول</span>
+      </mat-card>
+
+      <mat-card matRipple
+        class="tool d-flex flex-column align-items-center p-2 rounded-4 bg-primary text-white cursor-pointer">
+        <i class="fa-solid fa-play"></i>
+        <span class="title">السابق</span>
+      </mat-card>
+
+      <mat-card matRipple
+        class="tool d-flex flex-column align-items-center p-2 rounded-4 bg-primary text-white shadow cursor-pointer">
+        <i class="fa-solid fa-play rotate-180"></i>
+        <span class="title">التالي</span>
+      </mat-card>
+
+      <mat-card matRipple (click)="getLast()"
+        class="tool d-flex flex-column align-items-center p-2 rounded-4 bg-primary text-white cursor-pointer">
+        <i class="fa-solid fa-backward-step"></i>
+        <span class="title">الأخير</span>
+      </mat-card>
+    </div>
+    <!-- End Tools Of the Menu -->
+  </div>
+
+  <!-- Start Header Section -->
+  <div class="d-flex bg-white mt-3 user-select-none">
+    <mat-tab-group class="w-100">
+      <!-- First Tap -->
+      <mat-tab class="position-relative">
+        <!-- Tap Title -->
+        <ng-template mat-tab-label>
+          <div class="d-flex flex-row gap-1">
+            <i class="fa-light fa-clipboard-list-check text-danger"></i>
+            <span class="text-dark">بيانات الفاتوره</span>
+          </div>
+        </ng-template>
+
+        <!-- Loader Overlay -->
+        <div [class.d-none]="!isMainDataLoading"
+          class="position-absolute bg-white bg-opacity-75 z-1 w-100 h-100 d-flex align-items-center justify-content-center">
+          <mat-spinner></mat-spinner>
+        </div>
+
+        <!-- Start Tap Content -->
+        <form [formGroup]="purchaseOrderForm" (ngSubmit)="onSubmit()" class="inputs-group d-flex flex-wrap p-3">
+          <div class="form-input">
+            <mat-form-field class="w-100">
+              <mat-label>رقم المستند</mat-label>
+              <input formControlName="formNumber" matInput maxlength="256" #formNumber readonly>
+            </mat-form-field>
+          </div>
+
+          <div class="form-input">
+            <mat-form-field class="w-100">
+              <mat-label>اسم المستند - كود الرمز</mat-label>
+              <mat-select formControlName="selectedBookId">
+                <mat-option *ngFor="let book of allBooks;" [value]="book.bookId">
+                  <span>{{ book.bookNameAR }}</span>
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+
+          <div class="form-input">
+            <mat-form-field class="w-100" (click)="firstPicker.open()">
+              <mat-label>تاريخ التحرير</mat-label>
+              <input matInput [matDatepicker]="firstPicker" formControlName="trDate">
+              <mat-datepicker-toggle matIconSuffix [for]="firstPicker"></mat-datepicker-toggle>
+              <mat-datepicker #firstPicker></mat-datepicker>
+            </mat-form-field>
+          </div>
+
+          <div class="form-input">
+            <mat-form-field class="w-100" (click)="secondPicker.open()">
+              <mat-label>تاريخ الوصول</mat-label>
+              <input matInput [matDatepicker]="secondPicker" formControlName="arrivalDate">
+              <mat-datepicker-toggle matIconSuffix [for]="secondPicker"></mat-datepicker-toggle>
+              <mat-datepicker #secondPicker></mat-datepicker>
+            </mat-form-field>
+          </div>
+
+          <div class="form-input">
+            <div class="d-flex align-items-center gap-2">
+              <mat-form-field class="flex-grow-1">
+                <mat-label>المورد</mat-label>
+                <mat-select formControlName="vendorId" (selectionChange)="onVendorSelection()">
+                  <mat-option *ngFor="let vendor of allVendors" [value]="vendor.vendorId">
+                    {{ vendor.vendorDescA }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+              <button type="button" matRipple [class.d-none]="!isEdit"
+                class="bg-primary p-2 rounded-2 text-white cursor-pointer d-flex align items-center h6 m-0 border-0"
+                (click)="openVendorSearchDialog()">
+                <i class="fa-search fa-regular"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="form-input">
+            <mat-form-field class="w-100">
+              <mat-label>العملة</mat-label>
+              <mat-select formControlName="currencyId">
+                <mat-option *ngFor="let currency of allCurrencies;" [value]="currency.currencyId">
+                  {{ currency.currencyDescA }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+
+          <div class="form-input">
+            <mat-form-field class="w-100">
+              <mat-label>مدة التوريد</mat-label>
+              <input formControlName="deliveryPeriodDays" matInput>
+            </mat-form-field>
+          </div>
+
+          <div class="form-input">
+            <mat-form-field class="w-100">
+              <mat-label>مرجع</mat-label>
+              <input formControlName="manualTrNo" matInput>
+            </mat-form-field>
+          </div>
+
+          <div class="form-input">
+            <mat-form-field class="w-100">
+              <mat-label>نوع السداد</mat-label>
+              <mat-select formControlName="invoiceType">
+                <mat-option [value]="0">كاش</mat-option>
+                <mat-option [value]="1">أجل</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+
+          <div class="form-input">
+            <mat-form-field class="w-100">
+              <mat-label>مدة الدفع</mat-label>
+              <input formControlName="payPeriodDays" matInput maxlength="256">
+            </mat-form-field>
+          </div>
+
+          <div class="form-input">
+            <mat-form-field class="w-100">
+              <mat-label>الكود التحليلي</mat-label>
+              <mat-select formControlName="selectedAnalaticCodeId" (selectionChange)="onAnalaticCodeSelection()">
+                <mat-option *ngFor="let code of allAnalaticCodes" [value]="code.aId">
+                  {{ code.code }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+
+          <div class="form-input">
+            <mat-form-field class="w-100">
+              <mat-label>نوع الشراء</mat-label>
+              <input formControlName="analyticCodeDesc" matInput readonly>
+            </mat-form-field>
+          </div>
+
+          <div class="form-input">
+            <mat-form-field class="w-100">
+              <mat-label>بناءً علي</mat-label>
+              <mat-select formControlName="purchaseBasedOn">
+                <mat-option value="nothing">لا شيء</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+        </form>
+        <!-- End Tap Content -->
+      </mat-tab>
+
+      <!-- Second Tap -->
+      <mat-tab>
+        <!-- Tap Title -->
+        <ng-template mat-tab-label>
+          <div class="d-flex flex-row gap-1">
+            <i class="fa-light fa-nfc-magnifying-glass text-primary"></i>
+            <span class="text-dark">بيانات اضافيه</span>
+          </div>
+        </ng-template>
+
+        <!-- Tap Content -->
+        <div class="h5 text-center p-4 text-danger">
+          لا يوجد بيانات حتي الأن
+        </div>
+      </mat-tab>
+
+      <!-- Third Tap -->
+      <mat-tab>
+        <!-- Tap Title -->
+        <ng-template mat-tab-label>
+          <div class="d-flex flex-row gap-1">
+            <i class="fa-light fa-paperclip text-danger"></i>
+            <span class="text-dark">مرفقات</span>
+          </div>
+        </ng-template>
+
+        <!-- Tap Content -->
+        <div class="h5 text-center p-4 text-danger">
+          لا يوجد بيانات حتي الأن
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+  </div>
+  <!-- End Header Section -->
+
+  <!-- Start Table Section -->
+  <div class="d-flex bg-white mt-3">
+    <mat-tab-group class="w-100">
+      <!-- First Tap -->
+      <mat-tab>
+        <!-- Tap Title -->
+        <ng-template mat-tab-label>
+          <div class="d-flex flex-row gap-1">
+            <i class="fa-light fa-clipboard-list-check text-danger"></i>
+            <span class="text-dark">اصناف</span>
+          </div>
+        </ng-template>
+
+        <!-- Tap Content -->
+
+        <!-- Loader Overlay -->
+        <div [class.d-none]="!isDetailsLoading"
+          class="position-absolute bg-white bg-opacity-75 z-1 w-100 h-100 d-flex align-items-center justify-content-center">
+          <mat-spinner></mat-spinner>
+        </div>
+
+        <div class="d-felx flex-column gap-2 p-3">
+          <button matRipple class="btn btn-primary" (click)="addItem()" [disabled]="!isEdit">إضافة صنف</button>
+
+          <div class="p-3">
+            <table mat-table [dataSource]="dataSource" class="">
+              <!-- Item Code Column -->
+              <ng-container matColumnDef="itemCode">
+                <th mat-header-cell *matHeaderCellDef> كود الصنف </th>
+                <td mat-cell *matCellDef="let element" class="text-center">
+                  <span *ngIf="element.itemCode != null" >{{element.itemCode}}</span>
+                  <span *ngIf="!element.itemCode">-</span>
+                </td>
+              </ng-container>
+
+              <!-- Name Column -->
+              <ng-container matColumnDef="itemDescA">
+                <th mat-header-cell *matHeaderCellDef> الأسم </th>
+                <td mat-cell *matCellDef="let element; let i = index;">
+                  <mat-form-field>
+                    <mat-label>اسم الصنف</mat-label>
+                    <mat-select (selectionChange)="onItemNameChange(i, $event.value)" [value]="element.itemCardId" [disabled]="!isEdit">
+                      <mat-option *ngFor="let item of allItems;" [value]="item.itemCardId">
+                        {{ item.itemDescA }}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </td>
+              </ng-container>
+
+              <!-- Quantity Column -->
+              <ng-container matColumnDef="quantity">
+                <th mat-header-cell *matHeaderCellDef> الكميه </th>
+                <td mat-cell *matCellDef="let element; let i = index">
+                  <mat-form-field>
+                    <mat-label>الكميه</mat-label>
+                    <input matInput type="number" min="0" (input)="onQuantityChange(i, $event)" #quantity [value]="element.quantity" [disabled]="!isEdit">
+                  </mat-form-field>
+                </td>
+              </ng-container>
+
+              <!-- Price Column -->
+              <ng-container matColumnDef="price1">
+                <th mat-header-cell *matHeaderCellDef> السعر </th>
+                <td mat-cell *matCellDef="let element">
+                  <mat-form-field>
+                    <mat-label>السعر</mat-label>
+                    <input matInput [value]="element.price1  || ''" readonly [disabled]="!isEdit">
+                  </mat-form-field>
+                </td>
+              </ng-container>
+
+              <!-- Unit Column -->
+              <ng-container matColumnDef="unitName">
+                <th mat-header-cell *matHeaderCellDef> الوحده </th>
+                <td mat-cell *matCellDef="let element">
+                  <mat-form-field>
+                    <mat-label>الوحده</mat-label>
+                    <input matInput [value]="element.unitName || ''" readonly [disabled]="!isEdit">
+                  </mat-form-field>
+                </td>
+              </ng-container>
+
+              <!-- Total Column -->
+              <ng-container matColumnDef="total">
+                <th mat-header-cell *matHeaderCellDef> الإجمالي </th>
+                <td mat-cell *matCellDef="let element">
+                  <mat-form-field>
+                    <mat-label>الإجمالي</mat-label>
+                    <input matInput readonly [value]="element.total || ''" [disabled]="!isEdit">
+                  </mat-form-field>
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="options">
+                <th mat-header-cell *matHeaderCellDef><i class="fa-gears fa-regular"></i></th>
+                <td mat-cell *matCellDef="let element; let i = index;">
+                  <div class="options d-flex flex-row gap-2">
+                    <button class="btn btn-danger d-flex gap-1 align-items-center justify-content-center" (click)="removeItem(i)" [disabled]="!isEdit">
+                      <i class="fa-trash fa-regular"></i>
+                      <span>حذف</span>
+                    </button>
+                  </div>
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+            </table>
+          </div>
+        </div>
+      </mat-tab>
+      <!-- Second Tap -->
+      <mat-tab>
+        <!-- Tap Title -->
+        <ng-template mat-tab-label>
+          <div class="d-flex flex-row gap-1">
+            <i class="fa-regular fa-coins text-danger"></i>
+            <span class="text-dark">نقديه</span>
+          </div>
+        </ng-template>
+
+        <!-- Tap Content -->
+        <div class="h5 text-center p-4 text-danger">
+          لا يوجد بيانات حتي الأن
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+    <!-- End Table Section -->
+  </div>
+
+
+  <!-- End Menu Of The Page -->
+</div>
